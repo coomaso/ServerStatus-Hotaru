@@ -15,15 +15,15 @@ filepath=$(
   pwd
 )
 file_1=$(echo -e "${filepath}" | awk -F "$0" '{print $1}')
-file="/usr/local/ServerStatus"
-web_file="/usr/local/ServerStatus/web"
-server_file="/usr/local/ServerStatus/server"
-server_conf="/usr/local/ServerStatus/server/config.json"
-server_conf_1="/usr/local/ServerStatus/server/config.conf"
-client_file="/usr/local/ServerStatus/client"
+file="/root/local/ServerStatus"
+web_file="/root/local/ServerStatus/web"
+server_file="/root/local/ServerStatus/server"
+server_conf="/root/local/ServerStatus/server/config.json"
+server_conf_1="/root/local/ServerStatus/server/config.conf"
+client_file="/root/local/ServerStatus/client"
 
-client_log_file="/tmp/serverstatus_client.log"
-server_log_file="/tmp/serverstatus_server.log"
+client_log_file="/root/tmp/serverstatus_client.log"
+server_log_file="/root/tmp/serverstatus_server.log"
 jq_file="${file}/jq"
 region_json="${file}/region.json"
 
@@ -84,30 +84,30 @@ check_region() {
   return 1
 }
 Download_Server_Status_server() {
-  cd "/tmp" || exit 1
+  cd "/root/tmp" || exit 1
   [[ ${mirror_num} == 2 ]] && bundle_link="https://cokemine.coding.net/p/hotarunet/d/ServerStatus-Hotaru/git/archive/master/?download=true" || bundle_link="https://github.com/CokeMine/ServerStatus-Hotaru/archive/master.zip"
   wget -N --no-check-certificate "${bundle_link}" -O "master.zip"
   [[ ! -e "master.zip" ]] && echo -e "${Error} ServerStatus 服务端下载失败 !" && exit 1
   unzip master.zip
   rm -rf master.zip
-  [[ -d "/tmp/cokemine-hotarunet-ServerStatus-Hotaru-master" ]] && mv "/tmp/cokemine-hotarunet-ServerStatus-Hotaru-master" "/tmp/ServerStatus-Hotaru-master"
-  [[ ! -d "/tmp/ServerStatus-Hotaru-master" ]] && echo -e "${Error} ServerStatus 服务端解压失败 !" && exit 1
-  cd "/tmp/ServerStatus-Hotaru-master/server" || exit 1
+  [[ -d "/root/tmp/cokemine-hotarunet-ServerStatus-Hotaru-master" ]] && mv "/root/tmp/cokemine-hotarunet-ServerStatus-Hotaru-master" "/root/tmp/ServerStatus-Hotaru-master"
+  [[ ! -d "/root/tmp/ServerStatus-Hotaru-master" ]] && echo -e "${Error} ServerStatus 服务端解压失败 !" && exit 1
+  cd "/root/tmp/ServerStatus-Hotaru-master/server" || exit 1
   make
-  [[ ! -e "sergate" ]] && echo -e "${Error} ServerStatus 服务端编译失败 !" && cd "${file_1}" && rm -rf "/tmp/ServerStatus-Hotaru-master" && exit 1
+  [[ ! -e "sergate" ]] && echo -e "${Error} ServerStatus 服务端编译失败 !" && cd "${file_1}" && rm -rf "/root/tmp/ServerStatus-Hotaru-master" && exit 1
   cd "${file_1}" || exit 1
   [[ ! -e "${file}" ]] && mkdir "${file}"
   if [[ ! -e "${server_file}" ]]; then
     mkdir "${server_file}"
-    mv "/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
+    mv "/root/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
     wget -N --no-check-certificate https://github.com/CokeMine/Hotaru_theme/releases/latest/download/hotaru-theme.zip
     unzip hotaru-theme.zip && mv "./hotaru-theme" "${web_file}"
   else
     if [[ -e "${server_file}/sergate" ]]; then
       mv "${server_file}/sergate" "${server_file}/sergate1"
-      mv "/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
+      mv "/root/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
     else
-      mv "/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
+      mv "/root/tmp/ServerStatus-Hotaru-master/server/sergate" "${server_file}/sergate"
       wget -N --no-check-certificate https://github.com/CokeMine/Hotaru_theme/releases/latest/download/hotaru-theme.zip
       unzip hotaru-theme.zip && mv "./hotaru-theme" "${web_file}"
     fi
@@ -115,70 +115,70 @@ Download_Server_Status_server() {
   if [[ ! -e "${server_file}/sergate" ]]; then
     echo -e "${Error} ServerStatus 服务端移动重命名失败 !"
     [[ -e "${server_file}/sergate1" ]] && mv "${server_file}/sergate1" "${server_file}/sergate"
-    rm -rf "/tmp/ServerStatus-Hotaru-master"
+    rm -rf "/root/tmp/ServerStatus-Hotaru-master"
     exit 1
   else
     [[ -e "${server_file}/sergate1" ]] && rm -rf "${server_file}/sergate1"
-    rm -rf "/tmp/ServerStatus-Hotaru-master"
+    rm -rf "/root/tmp/ServerStatus-Hotaru-master"
   fi
 }
 Download_Server_Status_client() {
-  cd "/tmp" || exit 1
+  cd "/root/tmp" || exit 1
   wget -N --no-check-certificate "${link_prefix}/clients/status-client.py"
   [[ ! -e "status-client.py" ]] && echo -e "${Error} ServerStatus 客户端下载失败 !" && exit 1
   cd "${file_1}" || exit 1
   [[ ! -e "${file}" ]] && mkdir "${file}"
   if [[ ! -e "${client_file}" ]]; then
     mkdir "${client_file}"
-    mv "/tmp/status-client.py" "${client_file}/status-client.py"
+    mv "/root/tmp/status-client.py" "${client_file}/status-client.py"
   else
     if [[ -e "${client_file}/status-client.py" ]]; then
       mv "${client_file}/status-client.py" "${client_file}/status-client1.py"
-      mv "/tmp/status-client.py" "${client_file}/status-client.py"
+      mv "/root/tmp/status-client.py" "${client_file}/status-client.py"
     else
-      mv "/tmp/status-client.py" "${client_file}/status-client.py"
+      mv "/root/tmp/status-client.py" "${client_file}/status-client.py"
     fi
   fi
   if [[ ! -e "${client_file}/status-client.py" ]]; then
     echo -e "${Error} ServerStatus 客户端移动失败 !"
     [[ -e "${client_file}/status-client1.py" ]] && mv "${client_file}/status-client1.py" "${client_file}/status-client.py"
-    rm -rf "/tmp/status-client.py"
+    rm -rf "/root/tmp/status-client.py"
     exit 1
   else
     [[ -e "${client_file}/status-client1.py" ]] && rm -rf "${client_file}/status-client1.py"
-    rm -rf "/tmp/status-client.py"
+    rm -rf "/root/tmp/status-client.py"
   fi
 }
 Service_Server_Status_server() {
   if [[ ${release} == "centos" ]]; then
-    if ! wget --no-check-certificate "${link_prefix}/service/server_status_server_centos" -O /etc/init.d/status-server; then
+    if ! wget --no-check-certificate "${link_prefix}/service/server_status_server_centos" -O /root/etc/init.d/status-server; then
       echo -e "${Error} ServerStatus 服务端服务管理脚本下载失败 !" && exit 1
     fi
-    chmod +x /etc/init.d/status-server
+    chmod +x /root/etc/init.d/status-server
     chkconfig --add status-server
     chkconfig status-server on
   else
-    if ! wget --no-check-certificate "${link_prefix}/service/server_status_server_debian" -O /etc/init.d/status-server; then
+    if ! wget --no-check-certificate "${link_prefix}/service/server_status_server_debian" -O /root/etc/init.d/status-server; then
       echo -e "${Error} ServerStatus 服务端服务管理脚本下载失败 !" && exit 1
     fi
-    chmod +x /etc/init.d/status-server
+    chmod +x /root/etc/init.d/status-server
     update-rc.d -f status-server defaults
   fi
   echo -e "${Info} ServerStatus 服务端服务管理脚本下载完成 !"
 }
 Service_Server_Status_client() {
   if [[ ${release} == "centos" ]]; then
-    if ! wget --no-check-certificate "${link_prefix}/service/server_status_client_centos" -O /etc/init.d/status-client; then
+    if ! wget --no-check-certificate "${link_prefix}/service/server_status_client_centos" -O /root/etc/init.d/status-client; then
       echo -e "${Error} ServerStatus 客户端服务管理脚本下载失败 !" && exit 1
     fi
-    chmod +x /etc/init.d/status-client
+    chmod +x /root/etc/init.d/status-client
     chkconfig --add status-client
     chkconfig status-client on
   else
-    if ! wget --no-check-certificate "${link_prefix}/service/server_status_client_debian" -O /etc/init.d/status-client; then
+    if ! wget --no-check-certificate "${link_prefix}/service/server_status_client_debian" -O /root/etc/init.d/status-client; then
       echo -e "${Error} ServerStatus 客户端服务管理脚本下载失败 !" && exit 1
     fi
-    chmod +x /etc/init.d/status-client
+    chmod +x /root/etc/init.d/status-client
     update-rc.d -f status-client defaults
   fi
   echo -e "${Info} ServerStatus 客户端服务管理脚本下载完成 !"
